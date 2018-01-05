@@ -2,6 +2,10 @@
 #include <unistd.h>
 #include <ctime>
 #include <cstdlib>
+
+namespace FEHLib
+{
+
 using namespace std;
 
 class Tile
@@ -11,63 +15,146 @@ class Tile
     int xHigh;
     int yLow;
     int yHigh;
-    Tile(char col, int row);
+
+    Tile(){}
+    Tile(char col, int row)
+    {
+      if (col == 'A') {
+        xLow = 25;
+        xHigh = 180;
+      } else if (col == 'B') {
+        xLow = 180;
+        xHigh = 360;
+      } else if (col == 'C') {
+        xLow = 360;
+        xHigh = 540;
+      } else if (col == 'D') {
+        xLow = 540;
+        xHigh = 720;
+      } else if (col == 'E') {
+        xLow = 720;
+        xHigh = 900;
+      } else if (col == 'F') {
+        xLow = 900;
+        xHigh = 1050;
+      }
+
+      if (row == 1) {
+        yLow = 540;
+        yHigh = 630;
+      } else if (row == 2) {
+        yLow = 630;
+        yHigh = 810;
+      } else if (row == 3) {
+        yLow = 810;
+        yHigh = 990;
+      } else if (row == 4) {
+        yLow = 990;
+        yHigh = 1170;
+      } else if (row == 5) {
+        yLow = 1170;
+        yHigh = 1350;
+      } else if (row == 6) {
+        yLow = 1350;
+        yHigh = 1530;
+      } else if (row == 7) {
+        yLow = 1530;
+        yHigh = 1710;
+      } else if (row == 8) {
+        yLow = 1710;
+        yHigh = 1890;
+      }
+    }
+
+    void copyFrom(Tile &other)
+    {
+      this->xLow = other.xLow;
+      this->xHigh = other.xHigh;
+      this->yLow = other.yLow;
+      this->yHigh = other.yHigh;
+    }
+
+    static Tile tileAt(char col, int row)
+    {
+      Tile newTile(col, row);
+      return newTile;
+    }
 };
 
-Tile::Tile(char col, int row)
+class Hero
 {
-  if (col == 'A') {
-    xLow = 25;
-    xHigh = 180;
-  } else if (col == 'B') {
-    xLow = 180;
-    xHigh = 360;
-  } else if (col == 'C') {
-    xLow = 360;
-    xHigh = 540;
-  } else if (col == 'D') {
-    xLow = 540;
-    xHigh = 720;
-  } else if (col == 'E') {
-    xLow = 720;
-    xHigh = 900;
-  } else if (col == 'F') {
-    xLow = 900;
-    xHigh = 1050;
-  }
+  public:
+    Hero(){}
+    Hero(char col, int row, bool tank, bool healer, bool dancer, bool cheerleader)
+    {
+      tilePtr = new Tile(col, row);
+      this->tank = tank;
+      this->healer = healer;
+      this->dancer = dancer;
+      this->cheerleader = cheerleader;
+    }
+    Hero(char col, int row, bool tank, bool healer, bool dancer)
+    {
+      tilePtr = new Tile(col, row);
+      this->tank = tank;
+      this->healer = healer;
+      this->dancer = dancer;
+    }
+    Hero(char col, int row, bool cheerleader)
+    {
+      tilePtr = new Tile(col, row);
+      this->cheerleader = cheerleader;
+    }
+    Hero(char col, int row)
+    {
+      tilePtr = new Tile(col, row);
+    }
+    Hero(const Hero& hero) {deepCopy(hero);}
+    Hero& operator=(const Hero& hero) {deepCopy(hero); return *this;}
+    ~Hero() {delete tilePtr;}
 
-  if (row == 1) {
-    yLow = 540;
-    yHigh = 630;
-  } else if (row == 2) {
-    yLow = 630;
-    yHigh = 810;
-  } else if (row == 3) {
-    yLow = 810;
-    yHigh = 990;
-  } else if (row == 4) {
-    yLow = 990;
-    yHigh = 1170;
-  } else if (row == 5) {
-    yLow = 1170;
-    yHigh = 1350;
-  } else if (row == 6) {
-    yLow = 1350;
-    yHigh = 1530;
-  } else if (row == 7) {
-    yLow = 1530;
-    yHigh = 1710;
-  } else if (row == 8) {
-    yLow = 1710;
-    yHigh = 1890;
-  }
-}
+    void moveTo(Tile &tile)
+    {
+      //TODO: move hero to tile
+      tilePtr->copyFrom(tile);
+    }
 
-static Tile tileAt(char col, int row)
-{
-  Tile newTile(col, row);
-  return newTile;
-}
+    void moveTo(char col, int row)
+    {
+      //TODO: move hero to tile
+      Tile tile(col, row);
+      tilePtr->copyFrom(tile);
+    }
+
+    bool isTank() {return tank;}
+    bool isHealer() {return healer;}
+    bool isDancer() {return dancer;}
+    bool isCheerleader() {return cheerleader;}
+
+    void setData(char col, int row, bool tank, bool healer, bool dancer, bool cheerleader)
+    {
+      tilePtr = new Tile(col, row);
+      this->tank = tank;
+      this->healer = healer;
+      this->dancer = dancer;
+      this->cheerleader = cheerleader;
+    }
+
+    void deepCopy(Hero other)
+    {
+      this->tilePtr = other.tilePtr;
+      this->tank = other.tank;
+      this->healer = other.healer;
+      this->dancer = other.dancer;
+      this->cheerleader = other.cheerleader;
+    }
+  private:
+    bool tank = false;
+    bool healer = false;
+    bool dancer = false;
+    bool cheerleader = false;
+    Tile *tilePtr;
+};
 
 static void tap(int x, int y)
 {
@@ -90,7 +177,7 @@ static void tapRand(int xLow, int xHigh, int yLow, int yHigh)
   tap(xRand, yRand);
 }
 
-static void tapRand(Tile t)
+static void tapRand(Tile &t)
 {
   srand((unsigned)time(0));
   int xRange = t.xHigh - t.xLow + 1;
@@ -98,4 +185,6 @@ static void tapRand(Tile t)
   int yRange = t.yHigh - t.yLow + 1;
   int yRand = t.xLow + int(xRange * rand() / (RAND_MAX + 1.0));
   tap(xRand, yRand);
+}
+
 }
