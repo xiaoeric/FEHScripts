@@ -13,48 +13,47 @@ class Gym
       if (unit == 1) {
         autoTrain();
       } else if (unit == 2) {
-        guidedTrain(trainingTeam);
+        guidedTrain(convert(trainingTeam));
       }
     }
     static void autoTrain(){}
-    static void guidedTrain(int team[4]){}
-    static void swap(int team[4]) //TODO: use Hero vector instead
+    static void guidedTrain(vector<Hero> team){} //TODO: write these
+    static void swap(vector<Hero> team)
     {
       //TODO: click on swap units
-      if (team[0] != 1) {
-        if (team[2] == 1) {
-          //TODO: swap A7 and A8
-          team[2] = team[0];
-          team[0] = 1;
-        } else if (team[3] == 1) {
-          //TODO: swap A7 and B8
-          team[3] = team[0];
-          team[0] = 1;
+      if (!team[0].isTank()) {
+        if (team[2].isTank()) {
+          team[2].swapWith(team[0]);
+          team[2].swapRoles(team[0]);
+        } else if (team[3].isTank()) {
+          team[3].swapWith(team[0]);
+          team[3].swapRoles(team[0]);
         }
       }
 
-      if (team[1] != 1) {
-        if (team[2] == 1) {
-          //TODO: swap B7 and A8
-          team[2] = team[1];
-          team[1] = 1;
-        } else if (team[3] == 1) {
-          //TODO: swap B7 and B8
-          team[3] = team[1];
-          team[1] = 1;
+      if (!team[1].isTank()) {
+        if (team[2].isTank()) {
+          team[2].swapWith(team[1]);
+          team[2].swapRoles(team[1]);
+        } else if (team[3].isTank()) {
+          team[3].swapWith(team[1]);
+          team[3].swapRoles(team[1]);
         }
       }
 
-      if (team[2] == 9) {
-        //TODO: swap A8 and B8
-        team[2] = team[3];
-        team[3] = 9;
+      if (team[2].isTrainee()) {
+        team[2].swapWith(team[3]);
+        team[2].swapRoles(team[3]);
       }
+      /*By the end two tanks should be in team[0]
+       *and team[1], the support/cheerleader in team[2],
+       *and the trainee in team[3].
+       */
       //TODO: click on fight to resume
     }
-    static std::vector<Hero> convert(int team[4])
+    static vector<Hero> convert(int team[4])
     {
-      std::vector<Hero> newTeam(4);
+      vector<Hero> newTeam(4);
       newTeam[0].setData('A', 7, (team[0] == 1), (team[0] == 2), (team[0] == 3), (team[0] == 4));
       newTeam[1].setData('B', 7, (team[1] == 1), (team[1] == 2), (team[1] == 3), (team[1] == 4));
       newTeam[2].setData('A', 8, (team[2] == 1), (team[2] == 2), (team[2] == 3), (team[2] == 4));

@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <ctime>
 #include <cstdlib>
+#include <vector>
 
 namespace FEHLib
 {
@@ -11,6 +12,8 @@ using namespace std;
 class Tile
 {
   public:
+    char col;
+    int row;
     int xLow;
     int xHigh;
     int yLow;
@@ -19,6 +22,8 @@ class Tile
     Tile(){}
     Tile(char col, int row)
     {
+      this->col = col;
+      this->row = row;
       if (col == 'A') {
         xLow = 25;
         xHigh = 180;
@@ -66,8 +71,10 @@ class Tile
       }
     }
 
-    void copyFrom(Tile &other)
+    void copyFrom(Tile other)
     {
+      this->col = other.col;
+      this->row = other.row;
       this->xLow = other.xLow;
       this->xHigh = other.xHigh;
       this->yLow = other.yLow;
@@ -88,22 +95,22 @@ class Hero
     Hero(char col, int row, bool tank, bool healer, bool dancer, bool cheerleader)
     {
       tilePtr = new Tile(col, row);
-      this->tank = tank;
-      this->healer = healer;
-      this->dancer = dancer;
-      this->cheerleader = cheerleader;
+      roles[0] = tank;
+      roles[1] = healer;
+      roles[2] = dancer;
+      roles[3] = cheerleader;
     }
     Hero(char col, int row, bool tank, bool healer, bool dancer)
     {
       tilePtr = new Tile(col, row);
-      this->tank = tank;
-      this->healer = healer;
-      this->dancer = dancer;
+      roles[0] = tank;
+      roles[1] = healer;
+      roles[2] = dancer;
     }
     Hero(char col, int row, bool cheerleader)
     {
       tilePtr = new Tile(col, row);
-      this->cheerleader = cheerleader;
+      roles[3] = cheerleader;
     }
     Hero(char col, int row)
     {
@@ -113,7 +120,7 @@ class Hero
     Hero& operator=(const Hero& hero) {deepCopy(hero); return *this;}
     ~Hero() {delete tilePtr;}
 
-    void moveTo(Tile &tile)
+    void moveTo(Tile tile)
     {
       //TODO: move hero to tile
       tilePtr->copyFrom(tile);
@@ -126,33 +133,72 @@ class Hero
       tilePtr->copyFrom(tile);
     }
 
-    bool isTank() {return tank;}
-    bool isHealer() {return healer;}
-    bool isDancer() {return dancer;}
-    bool isCheerleader() {return cheerleader;}
+    void swapWith(Hero &swapee)
+    {
+      Tile temp = this->getTile();
+      this->moveTo(swapee.getTile());
+      swapee.setTile(temp);
+    }
+
+    void swapRoles(Hero &swapee) {swap(this->roles, swapee.roles);}
+
+    bool isTank() {return roles[0];}
+    bool isHealer() {return roles[1];}
+    bool isDancer() {return roles[2];}
+    bool isCheerleader() {return roles[3];}
+    bool isTrainee() {
+      if(  roles[0] == true
+        || roles[1] == true
+        || roles[2] == true
+        || roles[3] == true) return false;
+      else return true;
+    }
+    vector<bool> getRoles() {return roles;}
+    Tile getTile() {return *tilePtr;}
 
     void setData(char col, int row, bool tank, bool healer, bool dancer, bool cheerleader)
     {
       tilePtr = new Tile(col, row);
-      this->tank = tank;
-      this->healer = healer;
-      this->dancer = dancer;
-      this->cheerleader = cheerleader;
+      roles[0] = tank;
+      roles[1] = healer;
+      roles[2] = dancer;
+      roles[3] = cheerleader;
+    }
+
+    void setTile(Tile tile) {tilePtr->copyFrom(tile);}
+
+    void setTile(char col, char row)
+    {
+      Tile tile(col, row);
+      tilePtr->copyFrom(tile);
+    }
+
+    void setRoles(bool tank, bool healer, bool dancer, bool cheerleader)
+    {
+      roles[0] = tank;
+      roles[1] = healer;
+      roles[2] = dancer;
+      roles[3] = cheerleader;
+    }
+
+    void setRoles(vector<bool> roles)
+    {
+      this->roles[0] = roles[0];
+      this->roles[1] = roles[1];
+      this->roles[2] = roles[2];
+      this->roles[3] = roles[3];
     }
 
     void deepCopy(Hero other)
     {
-      this->tilePtr = other.tilePtr;
-      this->tank = other.tank;
-      this->healer = other.healer;
-      this->dancer = other.dancer;
-      this->cheerleader = other.cheerleader;
+      tilePtr = other.tilePtr;
+      roles[0] = other.roles[0];
+      roles[1] = other.roles[1];
+      roles[2] = other.roles[2];
+      roles[3] = other.roles[3];
     }
   private:
-    bool tank = false;
-    bool healer = false;
-    bool dancer = false;
-    bool cheerleader = false;
+    vector<bool> roles = {false, false, false, false};
     Tile *tilePtr;
 };
 
