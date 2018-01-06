@@ -20,16 +20,54 @@ class Gym
         guidedTrain(convert(trainingTeam));
       }
     }
-    static void autoTrain()
+    static void autoTrain() //TODO: consider using pointers to function
     {
       ADB::tapRand(ADB::autoBattle);
       sleep(0.25);
-      ADB::tapRand(ADB::confirmAutoBattle);
+      ADB::tapRand(ADB::confirmAction);
       sleep(60);
       ADB::tapRand(ADB::stageClear);
       sleep(9);
     }
-    static void guidedTrain(vector<Hero> team){} //TODO: write these
+
+    static void guidedTrain(vector<Hero> team)
+    {
+      ADB::tapRand(ADB::swapSpaces);
+      sleep(0.125);
+      swap(team);
+      ADB::tapRand(ADB::resumeFight);
+      sleep(2.25);
+
+      Hero &tankTop = team[0];
+      Hero &tankBot = team[1];
+      Hero &support = team[2];
+      Hero &trainee = team[3];
+
+      tankBot.moveTo('C', 7);
+      tankTop.moveTo('B', 7);
+      ADB::endTurnSeq(6);
+      tankTop.moveTo('B', 6);
+
+
+      /*tankBot moves to C7               x
+       *tankTop moves to B7               x
+       *end turn                          x
+       *tankTop moves to B6               x
+       *trainee attacks B5                implementing act function...
+       *support moves to B8
+       *end turn
+       *trainee attacks C6  ]
+       *dance B7            ] do 9 times
+       *trainee attacks B5  ]
+       *end turn            ]
+       *trainee attacks B5
+       *dance B7
+       *tankTop moves to A7
+       *trainee attacks B4
+       *end turn
+       */
+    }
+
     static void swap(vector<Hero> team)
     {
       //TODO: click on swap units

@@ -128,16 +128,30 @@ class ADB {
       return random;
     }
 
+    static void endTurnSeq(double wait)
+    {
+      tapRand(endTurn);
+      sleep(0.125);
+      tapRand(confirmAction);
+      sleep(wait);
+    }
+
     static const Selectable confirmFight;
     static const Selectable autoBattle;
-    static const Selectable confirmAutoBattle;
+    static const Selectable confirmAction; //Used for end turn and auto battle
     static const Selectable stageClear;
+    static const Selectable swapSpaces;
+    static const Selectable resumeFight;
+    static const Selectable endTurn;
 };
 
 const Selectable ADB::confirmFight(195, 1110, 890, 1220);
 const Selectable ADB::autoBattle(750, 1900, 910, 2050);
-const Selectable ADB::confirmAutoBattle(195, 1350, 885, 1145);
+const Selectable ADB::confirmAction(195, 1350, 885, 1145);
 const Selectable ADB::stageClear(200, 750, 900, 1500);
+const Selectable ADB::swapSpaces(575, 1900, 720, 2050);
+const Selectable ADB::resumeFight(480, 1920, 875, 2040);
+const Selectable ADB::endTurn(400, 1900, 550, 2050);
 
 class Hero
 {
@@ -175,6 +189,7 @@ class Hero
     {
       ADB::swipeRand(*tilePtr, tile);
       tilePtr->copyFrom(tile);
+      sleep(0.25);
     }
 
     void moveTo(char col, int row)
@@ -182,6 +197,7 @@ class Hero
       Tile tile(col, row);
       ADB::swipeRand(*tilePtr, tile);
       tilePtr->copyFrom(tile);
+      sleep(0.25);
     }
 
     void swapWith(Hero &swapee)
@@ -189,6 +205,7 @@ class Hero
       Tile temp = this->getTile();
       this->moveTo(swapee.getTile());
       swapee.setTile(temp);
+      sleep(0.25);
     }
 
     void swapRoles(Hero &swapee) {swap(this->roles, swapee.roles);}
