@@ -47,25 +47,22 @@ class Gym
       tankTop.moveTo('B', 7);
       ADB::endTurnSeq(6);
       tankTop.moveTo('B', 6);
-
-
-      /*tankBot moves to C7               x
-       *tankTop moves to B7               x
-       *end turn                          x
-       *tankTop moves to B6               x
-       *trainee attacks B5                implementing act function...
-       *support moves to B8
-       *end turn
-       *trainee attacks C6  ]
-       *dance B7            ] do 9 times
-       *trainee attacks B5  ]
-       *end turn            ]
-       *trainee attacks B5
-       *dance B7
-       *tankTop moves to A7
-       *trainee attacks B4
-       *end turn
-       */
+      trainee.actOn('B', 5);
+      support.moveTo('B', 8);
+      ADB::endTurnSeq(6);
+      for (int i = 0; i < 9; i++) {
+        trainee.actOn('C', 6);
+        support.actOn('B', 7);
+        trainee.actOn('B', 5);
+        ADB::endTurnSeq(6);
+      }
+      trainee.actOn('B', 5);
+      support.actOn('B', 7);
+      tankTop.moveTo('A', 7);
+      trainee.actOn('B', 4);
+      ADB::endTurnSeq(6);
+      ADB::tapRand(ADB::stageClear);
+      sleep(5);
     }
 
     static void swap(vector<Hero> team)

@@ -3,6 +3,7 @@
 #include <ctime>
 #include <cstdlib>
 #include <vector>
+#include <string>
 
 namespace FEHLib
 {
@@ -104,11 +105,16 @@ class Tile: public Selectable
 class ADB {
   public:
     static void tap(int x, int y)
-    {system("adb shell input tap " + x + ' ' + y);}
+    {
+      string command = "adb shell input tap " + to_string(x) + " " + to_string(y);
+      system(command.c_str());
+    }
 
     static void swipe(int x1, int y1, int x2, int y2)
-    {system("adb shell input swipe " + x1 + ' ' + y1
-      + ' ' + x2 + ' ' + y2);}
+    {
+      string command = "adb shell input swipe " + to_string(x1) + " " + to_string(y1) + " " + to_string(x2) + " " + to_string(y2);
+      system(command.c_str());
+    }
 
     static void tapRand(int xLow, int xHigh, int yLow, int yHigh)
     {tap(genRand(xLow, xHigh), genRand(yLow, yHigh));}
@@ -124,7 +130,7 @@ class ADB {
     {
       srand((unsigned)time(0));
       int range = high - low + 1;
-      int random = low + int(range * rand() / (RAND_MAX + 1.0));
+      int random = low + int(rand() % range);
       return random;
     }
 
@@ -208,7 +214,18 @@ class Hero
       sleep(0.25);
     }
 
-    void swapRoles(Hero &swapee) {swap(this->roles, swapee.roles);}
+    void actOn(Tile tile)
+    {
+      ADB::swipeRand(*tilePtr, tile);
+      sleep(0.25);
+    }
+
+    void actOn(char col, int row)
+    {
+      Tile tile(col, row);
+      ADB::swipeRand(*tilePtr, tile);
+      sleep(0.25);
+    }
 
     bool isTank() {return roles[0];}
     bool isHealer() {return roles[1];}
@@ -256,6 +273,8 @@ class Hero
       this->roles[2] = roles[2];
       this->roles[3] = roles[3];
     }
+
+    void swapRoles(Hero &swapee) {swap(this->roles, swapee.roles);}
 
     void deepCopy(Hero other)
     {
