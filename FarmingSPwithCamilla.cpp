@@ -10,13 +10,25 @@ class Gym
   public:
     static void train(int unit)
     {
+      ADB::tapRand(camillaHardMap);
+      sleep(0.25);
+      ADB::tapRand(ADB::confirmFight);
+      sleep(9);
       if (unit == 1) {
         autoTrain();
       } else if (unit == 2) {
         guidedTrain(convert(trainingTeam));
       }
     }
-    static void autoTrain(){}
+    static void autoTrain()
+    {
+      ADB::tapRand(ADB::autoBattle);
+      sleep(0.25);
+      ADB::tapRand(ADB::confirmAutoBattle);
+      sleep(60);
+      ADB::tapRand(ADB::stageClear);
+      sleep(9);
+    }
     static void guidedTrain(vector<Hero> team){} //TODO: write these
     static void swap(vector<Hero> team)
     {
@@ -60,7 +72,11 @@ class Gym
       newTeam[3].setData('B', 8, (team[3] == 1), (team[3] == 2), (team[3] == 3), (team[3] == 4));
       return newTeam;
     }
+
+    static const Selectable camillaHardMap;
 };
+
+const Selectable Gym::camillaHardMap(210, 1020, 825, 1210);
 
 int main()
 {

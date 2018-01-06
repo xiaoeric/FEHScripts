@@ -9,15 +9,28 @@ namespace FEHLib
 
 using namespace std;
 
-class Tile
+class Selectable
 {
   public:
-    char col;
-    int row;
     int xLow;
     int xHigh;
     int yLow;
     int yHigh;
+    Selectable(){}
+    Selectable(int xLow, int yLow, int xHigh, int yHigh)
+    {
+      this->xLow = xLow;
+      this->xHigh = xHigh;
+      this->yLow = yLow;
+      this->yHigh = yHigh;
+    }
+};
+
+class Tile: public Selectable
+{
+  public:
+    char col;
+    int row;
 
     Tile(){}
     Tile(char col, int row)
@@ -88,6 +101,44 @@ class Tile
     }
 };
 
+class ADB {
+  public:
+    static void tap(int x, int y)
+    {system("adb shell input tap " + x + ' ' + y);}
+
+    static void swipe(int x1, int y1, int x2, int y2)
+    {system("adb shell input swipe " + x1 + ' ' + y1
+      + ' ' + x2 + ' ' + y2);}
+
+    static void tapRand(int xLow, int xHigh, int yLow, int yHigh)
+    {tap(genRand(xLow, xHigh), genRand(yLow, yHigh));}
+
+    static void tapRand(Selectable s)
+    {tap(genRand(s.xLow, s.xHigh), genRand(s.yLow, s.yHigh));}
+
+    static void swipeRand(Selectable from, Selectable to)
+    {swipe(genRand(from.xLow, from.xHigh), genRand(from.yLow, from.yHigh),
+            genRand(to.xLow, to.xHigh), genRand(to.yLow, to.yHigh));}
+
+    static int genRand(int low, int high)
+    {
+      srand((unsigned)time(0));
+      int range = high - low + 1;
+      int random = low + int(range * rand() / (RAND_MAX + 1.0));
+      return random;
+    }
+
+    static const Selectable confirmFight;
+    static const Selectable autoBattle;
+    static const Selectable confirmAutoBattle;
+    static const Selectable stageClear;
+};
+
+const Selectable ADB::confirmFight(195, 1110, 890, 1220);
+const Selectable ADB::autoBattle(750, 1900, 910, 2050);
+const Selectable ADB::confirmAutoBattle(195, 1350, 885, 1145);
+const Selectable ADB::stageClear(200, 750, 900, 1500);
+
 class Hero
 {
   public:
@@ -122,14 +173,14 @@ class Hero
 
     void moveTo(Tile tile)
     {
-      //TODO: move hero to tile
+      ADB::swipeRand(*tilePtr, tile);
       tilePtr->copyFrom(tile);
     }
 
     void moveTo(char col, int row)
     {
-      //TODO: move hero to tile
       Tile tile(col, row);
+      ADB::swipeRand(*tilePtr, tile);
       tilePtr->copyFrom(tile);
     }
 
@@ -202,35 +253,4 @@ class Hero
     Tile *tilePtr;
 };
 
-static void tap(int x, int y)
-{
-  system("adb shell input tap " + x + ' ' + y);
-}
-
-static void swipe(int x1, int y1, int x2, int y2)
-{
-  system("adb shell input swipe " + x1 + ' ' + y1
-          + ' ' + x2 + ' ' + y2);
-}
-
-static void tapRand(int xLow, int xHigh, int yLow, int yHigh)
-{
-  srand((unsigned)time(0));
-  int xRange = xHigh - xLow + 1;
-  int xRand = xLow + int(xRange * rand() / (RAND_MAX + 1.0));
-  int yRange = yHigh - yLow + 1;
-  int yRand = xLow + int(xRange * rand() / (RAND_MAX + 1.0));
-  tap(xRand, yRand);
-}
-
-static void tapRand(Tile &t)
-{
-  srand((unsigned)time(0));
-  int xRange = t.xHigh - t.xLow + 1;
-  int xRand = t.xLow + int(xRange * rand() / (RAND_MAX + 1.0));
-  int yRange = t.yHigh - t.yLow + 1;
-  int yRand = t.xLow + int(xRange * rand() / (RAND_MAX + 1.0));
-  tap(xRand, yRand);
-}
-
-}
+} //Don't worry this is part of namespace declaration
