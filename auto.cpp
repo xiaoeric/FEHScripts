@@ -9,11 +9,15 @@ int reward;
 int target;
 int staminaPerRun;
 int stamina;
+bool isMiniTT;
 
 int main()
 {
   cout << "What's your current score?" << endl;
   cin >> points;
+
+  cout << "Is this a Mini Tempest Trials event? (0 for false, 1 for true)" << endl;
+  cin >> isMiniTT;
 
   cout << "What's your average score per run?" << endl;
   cin >> scorePerRun; //302 for Hard 4
@@ -27,7 +31,7 @@ int main()
   cout << "What's the stamina used per run?" << endl;
   cin >> staminaPerRun;
 
-  cout << "What's your current stamina?" << endl;
+  cout << "What's your current stamina? (Battle will begin after this question!)" << endl;
   cin >> stamina;
 
   int time_stop = 0;
@@ -80,8 +84,16 @@ int main()
     if(points >= reward){
       cout << "You've unlocked an award at " << reward << " points!" << endl;
       system("adb shell input tap 500 1400"); //Redeem
-      //reward += 2500; normal TT
-      reward += 1250; //mini TT
+      if(isMiniTT){
+        //reward += 2500; normal TT
+        reward += 1250; //mini TT
+      } else {
+        if(points < 500) reward += 100;
+        else if(points < 1000) reward += 300;
+        else if(points < 6000) reward += 500;
+        else if(points < 1200) reward += 1000;
+        else reward += 2500;
+      }
       cout << "You're next award is available at " << reward << " points!" << endl;
       sleep(1);
     }
@@ -97,6 +109,7 @@ int main()
     cout << "--Postbellum Report--" << endl;
     cout << "Stamina: " << stamina << endl;
     cout << "Points: " << points << endl;
+    cout << endl;
 
     if(points >= target){
       cout << "You've reached your target!" << endl;
